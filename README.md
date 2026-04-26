@@ -64,9 +64,9 @@ With Filebeat shipping from both Kali and the Pi, Kibana fills up with structure
 
 ### 4. Simulated attack from Kali
 
-Hydra, a tool that automates password guessing, runs an SSH brute force attempt from the Kali VM against the Pi. Within seconds, the failed login events show up in Kibana. This is the signal the detection rule is built around.
+Hydra, a tool that automates password guessing, runs an SSH brute force attempt from the Kali VM against the Pi. Within seconds(30 HOURS)?, the failed login events show up in Kibana. This is the signal the detection rule is built around.
 
-![Failed password events from the Kali attacker](docs/screenshots/04-failed-passwords.png)
+![Failed password events from the Kali attacker](docs/screenshots/04-failed-passwords.png)  
 # ADD NMAP SCAN
 ![Failed password events from the Kali attacker](docs/screenshots/04-failed-passwords.png)
 
