@@ -1,0 +1,134 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1100 680" width="100%" height="100%">
+    <defs>
+        <style>
+            @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap');
+            text {
+                font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            }
+            .title { font-size: 28px; font-weight: 700; fill: #0f172a; }
+            .subtitle { font-size: 14px; font-weight: 500; fill: #64748b; }
+            .section-label { font-size: 12px; font-weight: 700; fill: #94a3b8; letter-spacing: 0.15em; text-transform: uppercase; }
+            .box-title { font-size: 16px; font-weight: 600; fill: #0f172a; }
+            .box-desc { font-size: 13px; font-weight: 400; fill: #475569; }
+            .link-text { font-size: 12px; font-weight: 500; fill: #94a3b8; }
+            .defense-text { font-size: 13px; font-weight: 500; fill: #475569; }
+        </style>
+
+        <pattern id="dotGrid" x="0" y="0" width="24" height="24" patternUnits="userSpaceOnUse">
+            <circle cx="2" cy="2" r="1.5" fill="#cbd5e1" opacity="0.4"/>
+        </pattern>
+
+        <filter id="shadow-sm" x="-10%" y="-10%" width="120%" height="120%">
+            <feDropShadow dx="0" dy="2" stdDeviation="4" flood-color="#0f172a" flood-opacity="0.04"/>
+        </filter>
+        <filter id="shadow-md" x="-10%" y="-10%" width="120%" height="120%">
+            <feDropShadow dx="0" dy="4" stdDeviation="8" flood-color="#0f172a" flood-opacity="0.06"/>
+        </filter>
+
+        <marker id="arrowhead" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto">
+            <path d="M0,0 L6,3 L0,6 Z" fill="#94a3b8"/>
+        </marker>
+    </defs>
+
+    <rect width="100%" height="100%" fill="#ffffff" rx="12"/>
+    <rect width="100%" height="100%" fill="url(#dotGrid)" rx="12"/>
+    <rect width="100%" height="100%" fill="none" stroke="#e2e8f0" stroke-width="1.5" rx="12"/>
+
+    <text x="48" y="60" class="title">AI-Augmented SOC Pipeline</text>
+    <text x="48" y="84" class="subtitle">Raspberry Pi 5 · ELK Stack 8.19 · Claude Sonnet 4.5</text>
+
+    <text x="48" y="140" class="section-label">01 · Sources</text>
+    <text x="280" y="180" class="section-label">02 · ELK Pipeline</text>
+    <text x="680" y="365" class="section-label">03 · AI Triage</text>
+    <text x="680" y="525" class="section-label">04 · Output</text>
+
+    <g stroke="#94a3b8" stroke-width="2" fill="none">
+        <path d="M 228 195 L 254 195 L 254 235 L 272 235" marker-end="url(#arrowhead)"/>
+        <path d="M 228 295 L 254 295 L 254 235 L 272 235" marker-end="url(#arrowhead)"/>
+        
+        <path d="M 440 235 L 472 235" marker-end="url(#arrowhead)"/>
+        <path d="M 640 235 L 672 235" marker-end="url(#arrowhead)"/>
+        <path d="M 840 235 L 872 235" marker-end="url(#arrowhead)"/>
+
+        <path d="M 960 270 L 960 320 L 860 320 L 860 385" marker-end="url(#arrowhead)"/>
+        
+        <path d="M 860 496 L 860 542" marker-end="url(#arrowhead)"/>
+    </g>
+    
+    <text x="872" y="360" class="link-text">alerts via REST API</text>
+
+    <g transform="translate(48, 160)" filter="url(#shadow-sm)">
+        <rect width="180" height="70" rx="8" fill="#ffffff" stroke="#e2e8f0" stroke-width="1"/>
+        <rect width="6" height="70" rx="3" fill="#ef4444"/>
+        <text x="24" y="30" class="box-title">Kali VM</text>
+        <text x="24" y="52" class="box-desc">attacker · hydra · nmap</text>
+    </g>
+
+    <g transform="translate(48, 260)" filter="url(#shadow-sm)">
+        <rect width="180" height="70" rx="8" fill="#ffffff" stroke="#e2e8f0" stroke-width="1"/>
+        <rect width="6" height="70" rx="3" fill="#3b82f6"/>
+        <text x="24" y="30" class="box-title">Raspberry Pi 5</text>
+        <text x="24" y="52" class="box-desc">target · 4GB · debian</text>
+    </g>
+
+    <g transform="translate(280, 200)" filter="url(#shadow-sm)">
+        <rect width="160" height="70" rx="8" fill="#ffffff" stroke="#e2e8f0" stroke-width="1"/>
+        <rect width="6" height="70" rx="3" fill="#0ea5e9"/>
+        <text x="24" y="30" class="box-title">Filebeat</text>
+        <text x="24" y="52" class="box-desc">log shipper</text>
+    </g>
+
+    <g transform="translate(480, 200)" filter="url(#shadow-sm)">
+        <rect width="160" height="70" rx="8" fill="#ffffff" stroke="#e2e8f0" stroke-width="1"/>
+        <rect width="6" height="70" rx="3" fill="#0ea5e9"/>
+        <text x="24" y="30" class="box-title">Logstash</text>
+        <text x="24" y="52" class="box-desc">parse + enrich</text>
+    </g>
+
+    <g transform="translate(680, 200)" filter="url(#shadow-sm)">
+        <rect width="160" height="70" rx="8" fill="#ffffff" stroke="#e2e8f0" stroke-width="1"/>
+        <rect width="6" height="70" rx="3" fill="#0ea5e9"/>
+        <text x="24" y="30" class="box-title">Elasticsearch</text>
+        <text x="24" y="52" class="box-desc">index + search</text>
+    </g>
+
+    <g transform="translate(880, 200)" filter="url(#shadow-sm)">
+        <rect width="160" height="70" rx="8" fill="#ffffff" stroke="#e2e8f0" stroke-width="1"/>
+        <rect width="6" height="70" rx="3" fill="#0ea5e9"/>
+        <text x="24" y="30" class="box-title">Kibana</text>
+        <text x="24" y="52" class="box-desc">detect + alert</text>
+    </g>
+
+    <rect x="668" y="390" width="384" height="118" rx="12" fill="#fffbeb" stroke="#fde68a" stroke-width="1.5"/>
+    
+    <g transform="translate(680, 402)" filter="url(#shadow-md)">
+        <rect width="360" height="94" rx="8" fill="#ffffff" stroke="#e2e8f0" stroke-width="1"/>
+        <rect width="6" height="94" rx="3" fill="#f59e0b"/>
+        <text x="24" y="32" class="box-title" font-size="18">Python + Claude Sonnet 4.5</text>
+        <text x="24" y="56" class="box-desc">tier 2 triage · mitre att&amp;ck mapping</text>
+        <text x="24" y="78" class="box-desc">false-positive scoring · remediation plan</text>
+    </g>
+
+    <g transform="translate(680, 550)" filter="url(#shadow-sm)">
+        <rect width="360" height="70" rx="8" fill="#ffffff" stroke="#e2e8f0" stroke-width="1"/>
+        <rect width="6" height="70" rx="3" fill="#10b981"/>
+        <text x="24" y="30" class="box-title">JSON Incident Report</text>
+        <text x="24" y="52" class="box-desc">output/alert_*.json</text>
+    </g>
+
+    <text x="48" y="420" class="section-label">Defense-in-Depth</text>
+    <g transform="translate(48, 436)">
+        <rect width="220" height="136" rx="8" fill="#f8fafc" stroke="#cbd5e1" stroke-dasharray="4 4" stroke-width="1.5"/>
+        <circle cx="20" cy="30" r="3" fill="#94a3b8"/>
+        <text x="32" y="35" class="defense-text">ufw firewall</text>
+        
+        <circle cx="20" cy="58" r="3" fill="#94a3b8"/>
+        <text x="32" y="63" class="defense-text">quad9 dns filtering</text>
+        
+        <circle cx="20" cy="86" r="3" fill="#94a3b8"/>
+        <text x="32" y="91" class="defense-text">hardened ssh (key-only)</text>
+        
+        <circle cx="20" cy="114" r="3" fill="#94a3b8"/>
+        <text x="32" y="119" class="defense-text">filebeat self-monitoring</text>
+    </g>
+</svg>
