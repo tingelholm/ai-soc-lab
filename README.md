@@ -195,7 +195,3 @@ Kibana flagged this alert as **low** severity using its static thresholds. Claud
 A web dashboard (probably Streamlit) for browsing alerts visually is the next step, followed by Slack notifications so AI analyses land on my phone instead of sitting in a JSON file. Beyond that: support for additional attack types (port scanning, privilege escalation, lateral movement), Windows endpoint coverage via Winlogbeat, and prompt tuning based on the outcomes of past alerts.
 
 ---
-
-## License
-
-MIT. Use freely, attribution appreciated.
