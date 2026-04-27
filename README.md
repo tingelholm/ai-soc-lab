@@ -2,7 +2,7 @@
 
 > A self hosted Security Operations Center running on a Raspberry Pi 5.
 
-It catches simulated SSH brute force attacks against the Pi, then hands each alert to **Claude** to analyze. The result comes back as structured JSON in seconds: threat level, MITRE ATT&CK mapping, false positive likelihood, and concrete remediation actions.
+It catches simulated SSH brute force attacks against the Pi, then hands each alert to **Claude** to analyze. The result comes back as structured JSON in seconds.
 
 ![SOC Architecture](docs/architecture.svg)
 
