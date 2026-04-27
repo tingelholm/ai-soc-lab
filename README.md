@@ -60,7 +60,9 @@ With Filebeat shipping from both Kali and the Pi, Kibana fills up with structure
 
 ### 4a. Reconnaissance from Kali
 
-Before any actual attack, Kali runs an Nmap scan against the Pi to map out which ports are open and what services are listening. The scan picks up two interesting things. Port 22 is running SSH, which is the obvious target. But port 9200 is also open, exposing the Elasticsearch REST API and helpfully announcing its exact version (8.19.14), cluster name, and node name. In other words, the SIEM server is leaking its own fingerprint to anyone who scans it. That is exactly the kind of finding that turns a monitoring server into a target.
+Before any actual attack, Kali runs an Nmap scan against the Pi to map out which ports are open and what services are listening. The scan picks up two interesting things. Port 22 is running SSH, which is the obvious target. But port 9200 is also open, exposing the Elasticsearch REST API and helpfully announcing its exact version (8.19.14), cluster name, and node name. 
+
+In other words, the SIEM server is leaking its own fingerprint to anyone who scans it. That is exactly the kind of finding that turns a monitoring server into a target.
 
 ![Nmap scan of the Pi from Kali](docs/screenshots/04a-nmap-scan.png)
 
