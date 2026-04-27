@@ -10,19 +10,16 @@ It catches simulated SSH brute force attacks against the Pi, then hands each ale
 
 ## Why I built this
 
-I love working in my home lab, and I decided to see how far I could push my new Raspberry Pi 5. The plan was simple. Get the ELK Stack running on it, simulate attacks from a Kali Linux machine, and see whether an LLM could turn the resulting noise into something actually actionable. The Pi was the perfect excuse to build this on real hardware instead of cloud VMs. Limited memory, real network constraints, real consequences if I misconfigured something.
-
-The AI part came naturally. Security analysts spend a significant chunk of their day on the same handful of tasks: judging how serious an alert is, mapping it to known attack patterns, and deciding what is real signal versus background noise. I wanted to see whether Claude could do that part of the job in seconds.
-
-This project sits at the intersection of two things I enjoy: cybersecurity and making LLMs do useful work.
+I enjoy working with my Raspberry Pi 5, and I decided to see how far I could push it. The plan was simple. I decided to get the ELK Stack running on it, simulate attacks from a Kali Linux machine, and see whether an LLM could turn the resulting noise into something actually actionable. The Pi was the perfect excuse to build this on real hardware instead of cloud VMs. Limited memory, real network constraints, real consequences if I misconfigured something.
+This project sits at the intersection of two things I enjoy: cybersecurity and working effectively with LLMs.
 
 ---
 
 ## What it does
 
-Both the Kali attacker and the Pi itself run **Filebeat**, a small agent that ships every system log line into the **ELK Stack**. ELK is the open source trio at the heart of the pipeline: Elasticsearch stores and indexes the logs, Logstash parses them on the way in, and Kibana provides the search interface and detection engine on top. A custom rule in Kibana fires whenever 3 or more failed SSH logins happen within 5 minutes from the same source. A Python script then pulls those fresh alerts out of Elasticsearch through its HTTP API and hands each one to Claude with a "senior SOC analyst" prompt.
+Both the Kali attacker and the Pi itself run **Filebeat**, a small agent that ships every system log line into the **ELK Stack**. ELK is the open source trio at the heart of the pipeline: Elasticsearch stores and indexes the logs, Logstash parses them on the way in, and Kibana provides the search interface and detection engine on top. A custom rule in Kibana runs whenever 3 or more failed SSH logins happen within 5 minutes from the same source. A Python script then pulls those fresh alerts out of Elasticsearch through its API and hands each one to Claude with a "senior SOC analyst" prompt.
 
-Claude returns a structured response. It gives a threat level, and reclassifies it when the static rule underrates the event. It maps the alert to a known attack technique, scores how likely the alert is a false alarm, writes a short human readable summary, and proposes concrete remediation steps. Every analysis is printed to the terminal and written to disk as a JSON incident report ready for downstream automation.
+Claude returns a structured response. It gives a threat level, and reclassifies it when the static rule underrates the event. It maps the alert to a known attack technique, scores how likely the alert is a false alarm, writes a short human readable summary, and proposes concrete remediation steps. Every analysis is printed to the terminal and written as a JSON incident report.
 
 ---
 
@@ -62,35 +59,56 @@ With Filebeat shipping from both Kali and the Pi, Kibana fills up with structure
 
 ![Kibana Discover view with logs streaming in](docs/screenshots/03-kibana-logs.png)
 
-### 4. Simulated attack from Kali
+### 4a. Reconnaissance from Kali
 
-Hydra, a tool that automates password guessing, runs an SSH brute force attempt from the Kali VM against the Pi. Within seconds(30 HOURS)?, the failed login events show up in Kibana. This is the signal the detection rule is built around.
+Before any actual attack, Kali runs an Nmap scan against the Pi to map out which ports are open and what services are listening. The scan picks up two interesting things. Port 22 is running SSH, which is the obvious target. But port 9200 is also open, exposing the Elasticsearch REST API and helpfully announcing its exact version (8.19.14), cluster name, and node name. In other words, the SIEM server is leaking its own fingerprint to anyone who scans it. That is exactly the kind of finding that turns a monitoring server into a target.
 
-![Failed password events from the Kali attacker](docs/screenshots/04-failed-passwords.png)  
-# ADD NMAP SCAN
-![Failed password events from the Kali attacker](docs/screenshots/04-failed-passwords.png)
+![Nmap scan of the Pi from Kali](docs/screenshots/04a-nmap-scan.png)
 
-# ADD KALI ATTACK
+### 4b. The SSH attempt
+
+With SSH confirmed as open, the next step is to actually trigger the detection rule. I kept this deliberately simple: a few manual SSH login attempts as root with wrong passwords from the Kali VM. This is not a sophisticated attack, and it is not meant to be. The goal is to generate the exact log pattern (multiple failed authentications from the same source in a short window) that the detection rule is built to catch.
+
+![Failed SSH login attempts from the Kali VM](docs/screenshots/04b-ssh-attack.png)
+
+### 4c. Failed logins land in Kibana
+
+Every failed authentication on the Pi gets shipped to ELK by Filebeat and shows up in Kibana, filtered down to the `Failed password` pattern. This stream of events is the raw signal the detection rule watches.
+
 ![Failed password events from the Kali attacker](docs/screenshots/04-failed-passwords.png)
 
 
 ### 5. Detection rule fires
 
-The custom Kibana rule (3 or more failed SSH logins from the same source within 5 minutes) promotes the raw events into a proper alert. This is where a traditional security pipeline would either page a human analyst or get ignored as noise.
+The custom Kibana threshold rule sits at the heart of the SIEM. It promotes raw log events into proper alerts whenever a specific pattern shows up: 3 or more failed SSH logins from the same source IP within 5 minutes.
+
+#### 5a. The rule itself
+
+Built directly in Kibana's detection engine. A query filter on `agent.name: soc-server` and `message: "Failed password"`, grouped by source IP, with a threshold of 3 events. Tagged with the relevant MITRE ATT&CK technique (T1110.001) for traceability.
+
+![Detection rule configuration in Kibana](docs/screenshots/05a-rule-config.png)
+
+#### 5b. The alert fires
+
+When the threshold is crossed, the rule generates alerts in the Security app. In this run, four alerts fired across two clusters of failed login attempts.
+
+Notice the severity each one gets: **Low**. By the rule's own static logic, "a few failed SSH logins" doesn't look catastrophic. That label is correct on paper but missing context, the target is the SIEM itself, and the pattern is mechanical rather than human.
 
 ![Triggered alerts in the Kibana Security app](docs/screenshots/05-alerts.png)
 
 ### 6. Claude takes the alert
 
-The Python script pulls the alert from Elasticsearch and sends it to Claude with a senior analyst prompt. Claude returns a structured verdict: threat level, attack type, MITRE technique, false alarm assessment with a confidence score, a written summary, and remediation steps. The whole round trip takes a couple of seconds.
+The Python script pulls each alert from Elasticsearch and sends it to Claude with a senior analyst system prompt. Claude returns a structured verdict: threat level, attack type, MITRE technique, false positive assessment with a confidence score, a written summary, and a list of concrete remediation steps. The whole round trip takes a couple of seconds per alert.
 
-![Terminal output of analyze_alerts.py showing Claude's structured analysis](docs/screenshots/06-ai-analysis.png)
+In this run, all three alerts came back classified as **Medium** threat level with a confidence of 0.75 — Claude consistently disagreed with Kibana's static "Low" rating, exactly as a human analyst would after seeing the actual pattern.
+
+![Terminal output of analyze_alerts.py showing Claude's structured analysis of three alerts](docs/screenshots/06-ai-analysis.png)
 
 ### 7. Persisted as a JSON incident report
 
-Each analysis is saved to disk as a timestamped JSON file containing both the original alert and the AI verdict. This is the format I would hand to downstream automation, whether that means alerting the team, opening a ticket, or kicking off an automated response.
+Each analysis is saved to disk as a timestamped JSON file containing both the original `alert` (rule, timestamp, severity) and the `ai_analysis` block (threat level, MITRE technique, confidence, summary, recommended actions). This is the format I would hand to downstream automation, whether that means alerting the team, opening a ticket, or kicking off an automated response.
 
-![JSON output file showing alert and ai_analysis fields](docs/screenshots/07-json-report.png)
+![JSON output file showing the alert and ai_analysis structure](docs/screenshots/07-json-report.png)
 
 ---
 
