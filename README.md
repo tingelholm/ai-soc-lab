@@ -68,7 +68,9 @@ In other words, the SIEM server is leaking its own fingerprint to anyone who sca
 
 ### 4b. The SSH attempt
 
-With SSH confirmed as open, the next step is to actually trigger the detection rule. I kept this deliberately simple: a few manual SSH login attempts as root with wrong passwords from the Kali VM. This is not a sophisticated attack, and it is not meant to be. The goal is to generate the exact log pattern (multiple failed authentications from the same source in a short window) that the detection rule is built to catch.
+With SSH confirmed as open, the next step is to actually trigger the detection rule. I kept this deliberately simple: a few manual SSH login attempts as root with wrong passwords from the Kali VM.
+
+This is not a sophisticated attack, and it is not meant to be. The goal is to generate the exact log pattern (multiple failed authentications from the same source in a short window) that the detection rule is built to catch.
 
 ![Failed SSH login attempts from the Kali VM](docs/screenshots/04b-ssh-attack.png)
 
